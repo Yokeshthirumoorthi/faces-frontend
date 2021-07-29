@@ -1,8 +1,42 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Alert, Spinner, Table } from "react-bootstrap";
+import { Card, Button, Form, Spinner, Table } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
-import { FetchStatus, useGetAlbums } from "../hooks/server";
+import {
+  FetchStatus,
+  useGetAlbums,
+  SaveStatus,
+  useCreateAlbum,
+} from "../hooks/server";
 import { Link, useHistory } from "react-router-dom";
+
+function CreateAlbumForm({ handleCreateAlbum }) {
+  const [albumName, setAlbumName] = useState("");
+
+  const handleSubmit = () => {
+    handleCreateAlbum(albumName);
+    setAlbumName("");
+  };
+
+  return (
+    <Card>
+      <Card.Body>
+        <Form>
+          <Form.Group id="albumName">
+            <Form.Label>Create New Album</Form.Label>
+            <Form.Control
+              type="text"
+              value={albumName}
+              onChange={(e) => setAlbumName(e.target.value)}
+            />
+          </Form.Group>
+          <Button className="w-100" onClick={handleSubmit}>
+            Create
+          </Button>
+        </Form>
+      </Card.Body>
+    </Card>
+  );
+}
 
 function AlbumsListTable({ albums }) {
   return (
@@ -49,17 +83,25 @@ function TableComponent({ getAlbumsStatus, albums }) {
 export default function AlbumsDashboard() {
   const { currentUser } = useAuth();
   const [getAlbums, getAlbumsStatus, albums] = useGetAlbums(currentUser);
+  const [createAlbum, createAlbumStatus] = useCreateAlbum(currentUser);
 
   useEffect(() => {
     getAlbums();
   }, []);
 
+  let handleCreateAlbum = (albumName) => {
+    createAlbum(albumName, getAlbums);
+  };
+
   return (
-    <Card>
-      <Card.Body>
-        <h2 className="text-center mb-4">Albums</h2>
-        <TableComponent getAlbumsStatus={getAlbumsStatus} albums={albums} />
-      </Card.Body>
-    </Card>
+    <>
+      <CreateAlbumForm handleCreateAlbum={handleCreateAlbum} />
+      <Card>
+        <Card.Body>
+          <h2 className="text-center mb-4">Albums</h2>
+          <TableComponent getAlbumsStatus={getAlbumsStatus} albums={albums} />
+        </Card.Body>
+      </Card>
+    </>
   );
 }
