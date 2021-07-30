@@ -54,7 +54,7 @@ function AlbumsListTable({ albums }) {
             <td>{album}</td>
             <td>-</td>
             <td>
-              <Link to="/update-profile" className="btn btn-primary">
+              <Link to={`/upload/${album}`} className="btn btn-primary">
                 Upload
               </Link>
             </td>
