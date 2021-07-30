@@ -62,4 +62,35 @@ let useCreateAlbum = (currentUser) => {
   return [createAlbum, createAlbumStatus];
 };
 
-export { FetchStatus, useGetAlbums, SaveStatus, useCreateAlbum };
+let useGetAlbumJson = (currentUser) => {
+  const [getAlbumJsonStatus, dispatch] = React.useState(
+    FetchStatus.FetchNotCalled
+  );
+  const [albumJson, setAlbumJson] = React.useState({});
+
+  let getAlbumJson = async (albumName) => {
+    // albumName = "testalbum"; // TODO: delete this line
+    dispatch(FetchStatus.Fetching);
+    const idToken = await currentUser.getIdToken(/* forceRefresh */ true);
+    const headers = {
+      Authorization: `Bearer ${idToken}`,
+    };
+    const url = `http://192.168.1.13:8081/api/v1/gallery/album/${albumName}/${currentUser.uid}`;
+    const getAlbumJsonResponse = await axios.get(url, { headers });
+
+    console.log(getAlbumJsonResponse);
+    setAlbumJson(getAlbumJsonResponse.data);
+
+    dispatch(FetchStatus.FetchSuccess);
+  };
+
+  return [getAlbumJson, getAlbumJsonStatus, albumJson];
+};
+
+export {
+  FetchStatus,
+  useGetAlbums,
+  SaveStatus,
+  useCreateAlbum,
+  useGetAlbumJson,
+};

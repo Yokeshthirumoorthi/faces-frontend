@@ -51,10 +51,20 @@ function AlbumsListTable({ albums }) {
       <tbody>
         {albums.map((album) => (
           <tr key={album}>
-            <td>{album}</td>
+            <td>
+              <Link
+                to={`/gallery/${album}`}
+                className="list-group-item list-group-item-action"
+              >
+                {album}
+              </Link>
+            </td>
             <td>-</td>
             <td>
-              <Link to={`/upload/${album}`} className="btn btn-primary">
+              <Link
+                to={`/upload/${album}`}
+                className="list-group-item list-group-item-action"
+              >
                 Upload
               </Link>
             </td>

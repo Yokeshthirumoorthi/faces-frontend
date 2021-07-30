@@ -5,6 +5,7 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import AlbumsDashboard from "./AlbumsDashboard";
+import PhotoGallery from "./PhotoGallery";
 import Upload from "./Upload";
 import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
@@ -22,6 +23,11 @@ function App() {
           <AuthProvider>
             <Switch>
               <PrivateRoute exact path="/" component={AlbumsDashboard} />
+              <PrivateRoute
+                exact
+                path="/gallery/:album_name"
+                component={PhotoGallery}
+              />
               <PrivateRoute
                 exact
                 path="/upload/:album_name"
