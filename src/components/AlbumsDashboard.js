@@ -38,6 +38,8 @@ import Pig from "pig-react";
 import imageData from "./imageData.json";
 
 import Upload from "./Upload";
+import _ from "lodash";
+
 import "./base.css";
 
 function CreateAlbumButton({ onClick }) {
@@ -383,29 +385,63 @@ function MainContentSection({ setMobileMenuOpen }) {
 
 function PigSection({ setMobileMenuOpen }) {
   const { currentUser } = useAuth();
-  const [getAlbumJson, _getAlbumJsonStatus, _albumJson] =
+  const [getAlbumJson, getAlbumJsonStatus, albumJson] =
     useGetAlbumJson(currentUser);
+  const [selectedUserId, setSelectedUserId] = useState(1);
 
   const { album_name } = useParams();
 
-  console.log(album_name);
   useEffect(() => {
-    getAlbumJson(album_name);
+    if (getAlbumJsonStatus == FetchStatus.FetchNotCalled) {
+      getAlbumJson(album_name);
+    }
   }, []);
+
+  const recommendedPhotos = (selectedUserId) => {
+    const recommendations = albumJson.recommendations;
+    const photos = _.find(recommendations, function (o) {
+      return o.label == selectedUserId;
+    }).photos;
+    const imageData = photos.map((photo) => {
+      return {
+        dominantColor: "#0C0E14",
+        url: `http://192.168.1.13:8081/static_sm/${album_name}/${photo}`,
+        date: "22 October 2017",
+        aspectRatio: 1.5,
+      };
+    });
+    return imageData;
+  };
+
+  const rederPig = (getAlbumJsonStatus) => {
+    switch (getAlbumJsonStatus) {
+      case FetchStatus.FetchSuccess:
+        return (
+          <Pig
+            imageData={recommendedPhotos(selectedUserId)}
+            gridGap={2}
+            bgColor="hsla(211, 50%, 98%)"
+            groupGapLg={50}
+            groupGapSm={20}
+            breakpoint={800}
+            // sortByDate
+            // groupByDate
+          />
+        );
+      default:
+        return (
+          <>
+            <ClockIcon className="w-5 h-5 text-gray-400" aria-hidden="true" />
+            <span className="ml-3">Loading Please Wait</span>
+          </>
+        );
+    }
+  };
 
   return (
     <>
       <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
-      <Pig
-        imageData={imageData}
-        gridGap={2}
-        bgColor="hsla(211, 50%, 98%)"
-        groupGapLg={50}
-        groupGapSm={20}
-        breakpoint={800}
-        // sortByDate
-        // groupByDate
-      />
+      {rederPig(getAlbumJsonStatus)}
     </>
   );
 }
