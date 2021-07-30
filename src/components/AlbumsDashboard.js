@@ -5,9 +5,16 @@ import {
   useGetAlbums,
   // SaveStatus,
   useCreateAlbum,
+  useGetAlbumJson,
 } from "../hooks/server";
 
-import { Link, useRouteMatch, Switch, Route } from "react-router-dom";
+import {
+  Link,
+  useRouteMatch,
+  Switch,
+  Route,
+  useParams,
+} from "react-router-dom";
 
 /* This example requires Tailwind CSS v2.0+ */
 import { PlusIcon as PlusIconSolid } from "@heroicons/react/solid";
@@ -30,8 +37,8 @@ import {
 import Pig from "pig-react";
 import imageData from "./imageData.json";
 
+import Upload from "./Upload";
 import "./base.css";
-import { Navbar } from "react-bootstrap";
 
 function CreateAlbumButton({ onClick }) {
   return (
@@ -72,7 +79,7 @@ function AlbumNameGrid({ albums }) {
             <div className="-mt-px flex divide-x divide-gray-200">
               <div className="w-0 flex-1 flex">
                 <Link
-                  to={`/gallery/${album}`}
+                  to={`/app/photos/${album}`}
                   className="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500"
                 >
                   <PhotographIcon
@@ -84,7 +91,7 @@ function AlbumNameGrid({ albums }) {
               </div>
               <div className="-ml-px w-0 flex-1 flex">
                 <Link
-                  to={`/upload/${album}`}
+                  to={`/app/upload/${album}`}
                   className="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500"
                 >
                   <CloudUploadIcon
@@ -375,6 +382,17 @@ function MainContentSection({ setMobileMenuOpen }) {
 }
 
 function PigSection({ setMobileMenuOpen }) {
+  const { currentUser } = useAuth();
+  const [getAlbumJson, _getAlbumJsonStatus, _albumJson] =
+    useGetAlbumJson(currentUser);
+
+  const { album_name } = useParams();
+
+  console.log(album_name);
+  useEffect(() => {
+    getAlbumJson(album_name);
+  }, []);
+
   return (
     <>
       <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
@@ -552,11 +570,15 @@ export default function AppPage({ children }) {
           <Route exact path={path}>
             <MainContentSection setMobileMenuOpen={setMobileMenuOpen} />
           </Route>
-          <Route path={`${path}/photos`}>
+          <Route path={`${path}/photos/:album_name`}>
             <PigSection setMobileMenuOpen={setMobileMenuOpen} />
           </Route>
           <Route path={`${path}/albums`}>
             <MainContentSection setMobileMenuOpen={setMobileMenuOpen} />
+          </Route>
+          <Route path={`${path}/upload/:album_name`}>
+            <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
+            <Upload />
           </Route>
           <Route path={`${path}/login`}>
             <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
