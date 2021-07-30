@@ -46,7 +46,7 @@ export default function Filepond() {
         name="file"
         instantUpload={true}
         chunkUploads={true}
-        chunkSize={50000}
+        chunkSize={10000}
         allowRevert={false}
         server={{
           process: async (
