@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import {
   FetchStatus,
@@ -14,6 +14,7 @@ import {
   Switch,
   Route,
   useParams,
+  useHistory,
 } from "react-router-dom";
 
 /* This example requires Tailwind CSS v2.0+ */
@@ -126,6 +127,28 @@ function TableComponent({ getAlbumsStatus, albums }) {
 }
 
 function LoginSection() {
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const { login } = useAuth();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const history = useHistory();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    try {
+      setError("");
+      setLoading(true);
+      // await login(emailRef.current.value, passwordRef.current.value);
+      await login("cd@e.com", "ffffff"); // TODO
+      history.push("/app");
+    } catch {
+      setError("Failed to log in");
+    }
+
+    setLoading(false);
+  }
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -150,7 +173,7 @@ function LoginSection() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" action="#" method="POST">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
@@ -267,9 +290,10 @@ function LoginSection() {
 }
 
 const navigation = [
-  { name: "Home", href: "", icon: HomeIcon, current: false },
+  // { name: "Home", href: "", icon: HomeIcon, current: false },
   { name: "Albums", href: "albums", icon: CollectionIcon, current: true },
   { name: "Photos", href: "photos", icon: PhotographIcon, current: false },
+  { name: "Profile", href: "login", icon: PhotographIcon, current: false }, // TODO:
   { name: "Logout", href: "login", icon: LogoutIcon, current: false },
 ];
 
@@ -387,7 +411,7 @@ function PigSection({ setMobileMenuOpen }) {
   const { currentUser } = useAuth();
   const [getAlbumJson, getAlbumJsonStatus, albumJson] =
     useGetAlbumJson(currentUser);
-  const [selectedUserId, setSelectedUserId] = useState(1);
+  const [selectedUserId, setSelectedUserId] = useState(0);
 
   const { album_name } = useParams();
 
@@ -451,11 +475,13 @@ function Sidebar({ url }) {
     <div className="hidden w-28 bg-indigo-700 overflow-y-auto md:block">
       <div className="w-full py-6 flex flex-col items-center">
         <div className="flex-shrink-0 flex items-center">
-          <img
-            className="h-8 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-mark.svg?color=white"
-            alt="Workflow"
-          />
+          <Link to="/">
+            <img
+              className="h-8 w-auto"
+              src="https://tailwindui.com/img/logos/workflow-mark.svg?color=white"
+              alt="Workflow"
+            />
+          </Link>
         </div>
         <div className="flex-1 mt-6 w-full px-2 space-y-1">
           {navigation.map((item) => (

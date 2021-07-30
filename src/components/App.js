@@ -7,6 +7,7 @@ import Dashboard from "./Dashboard";
 import AppPageRouter from "./AlbumsDashboard";
 import PhotoGallery from "./PhotoGallery";
 import Upload from "./Upload";
+import Home from "./Home";
 import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
 import ForgotPassword from "./ForgotPassword";
@@ -17,17 +18,10 @@ function App() {
     <Router>
       <AuthProvider>
         <Switch>
-          <PrivateRoute exact path="/" component={Login} />
-          <PrivateRoute
-            exact
-            path="/gallery/:album_name"
-            component={PhotoGallery}
-          />
-          <PrivateRoute exact path="/upload/:album_name" component={Upload} />
-          <PrivateRoute path="/update-profile" component={UpdateProfile} />
-          <Route path="/signup" component={Signup} />
-          <Route path="/app" component={AppPageRouter} />
-          <Route path="/forgot-password" component={ForgotPassword} />
+          <Route exact path="/" component={Home} />
+          <PrivateRoute path="/app" component={AppPageRouter} />
+          {/* <Route path="/signup" component={Signup} />
+          <Route path="/forgot-password" component={ForgotPassword} /> */}
         </Switch>
       </AuthProvider>
     </Router>
