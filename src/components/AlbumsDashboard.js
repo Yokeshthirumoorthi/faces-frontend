@@ -26,6 +26,11 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 
+import Pig from "pig-react";
+import imageData from "./imageData.json";
+
+import "./base.css";
+
 function CreateAlbumButton({ onClick }) {
   return (
     <button
@@ -367,6 +372,24 @@ function MainContentSection({ setMobileMenuOpen }) {
   );
 }
 
+function PigSection({ setMobileMenuOpen }) {
+  return (
+    <>
+      <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
+      <Pig
+        imageData={imageData}
+        gridGap={2}
+        bgColor="hsla(211, 50%, 98%)"
+        groupGapLg={50}
+        groupGapSm={20}
+        breakpoint={800}
+        // sortByDate
+        // groupByDate
+      />
+    </>
+  );
+}
+
 export default function AppPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -507,11 +530,12 @@ export default function AppPage() {
       </Transition.Root>
 
       {/* Content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-auto">
         {/* Main content */}
-        <MainContentSection setMobileMenuOpen={setMobileMenuOpen} />
+        {/* <MainContentSection setMobileMenuOpen={setMobileMenuOpen} /> */}
         {/* <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} /> */}
         {/* <LoginSection /> */}
+        <PigSection setMobileMenuOpen={setMobileMenuOpen} />
       </div>
     </div>
   );
