@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { Button } from "react-bootstrap";
+import { useProcessAlbum } from "../hooks/server";
 
 import { FilePond, File, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -11,6 +13,22 @@ import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 // Register the plugins
 registerPlugin(FilePondPluginImagePreview);
 
+function ProcessAlbumButton({ albumName }) {
+  const { currentUser } = useAuth();
+  const [processAlbum, processAlbumStatus] = useProcessAlbum(currentUser);
+
+  function handleProcessAlbum() {
+    console.log("Processing Album");
+    processAlbum(albumName);
+  }
+
+  return (
+    <Button variant="link" onClick={handleProcessAlbum}>
+      Process Album
+    </Button>
+  );
+}
+
 export default function Filepond() {
   const { currentUser } = useAuth();
   const [files, setFiles] = useState([]);
@@ -18,6 +36,7 @@ export default function Filepond() {
 
   return (
     <div className="App">
+      <ProcessAlbumButton albumName={album_name} />
       <FilePond
         files={files}
         onupdatefiles={setFiles}

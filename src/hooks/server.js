@@ -87,10 +87,32 @@ let useGetAlbumJson = (currentUser) => {
   return [getAlbumJson, getAlbumJsonStatus, albumJson];
 };
 
+let useProcessAlbum = (currentUser) => {
+  const [processAlbumStatus, dispatch] = React.useState(
+    FetchStatus.FetchNotCalled
+  );
+
+  let processAlbum = async (albumName) => {
+    // albumName = "testalbum"; // TODO: delete this line
+    dispatch(FetchStatus.Fetching);
+    const idToken = await currentUser.getIdToken(/* forceRefresh */ true);
+    const headers = {
+      Authorization: `Bearer ${idToken}`,
+    };
+    const url = `http://192.168.1.13:8081/api/v1/upload/done`;
+    let payload = { album_name: albumName, user_id: currentUser.uid };
+    await axios.post(url, payload, { headers });
+
+    dispatch(FetchStatus.FetchSuccess);
+  };
+
+  return [processAlbum, processAlbumStatus];
+};
 export {
   FetchStatus,
   useGetAlbums,
   SaveStatus,
   useCreateAlbum,
   useGetAlbumJson,
+  useProcessAlbum,
 };
