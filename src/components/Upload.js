@@ -9,13 +9,14 @@ import "filepond/dist/filepond.min.css";
 
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import "./filepond.css";
 
 // Register the plugins
 registerPlugin(FilePondPluginImagePreview);
 
 function ProcessAlbumButton({ albumName }) {
   const { currentUser } = useAuth();
-  const [processAlbum, processAlbumStatus] = useProcessAlbum(currentUser);
+  const [processAlbum, _processAlbumStatus] = useProcessAlbum(currentUser);
 
   function handleProcessAlbum() {
     console.log("Processing Album");
@@ -43,17 +44,21 @@ export default function Filepond() {
         allowMultiple={true}
         maxParallelUploads={25}
         name="file"
+        instantUpload={true}
+        chunkUploads={true}
+        chunkSize={50000}
+        allowRevert={false}
         server={{
           process: async (
             fieldName,
             file,
-            metadata,
+            _metadata,
             load,
             error,
             progress,
-            abort,
-            transfer,
-            options
+            _abort,
+            _transfer,
+            _options
           ) => {
             const idToken = await currentUser.getIdToken(
               /* forceRefresh */ true
