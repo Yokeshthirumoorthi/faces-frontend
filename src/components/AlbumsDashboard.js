@@ -26,13 +26,14 @@ import {
 
 import { Dialog, Transition } from "@headlessui/react";
 import {
-  LogoutIcon,
+  UserIcon,
   CollectionIcon,
   MenuAlt2Icon,
   XIcon,
 } from "@heroicons/react/outline";
 
 import Pig from "pig-react";
+import UpdateProfile from "./UpdateProfile";
 
 import Upload from "./Upload";
 import _ from "lodash";
@@ -296,8 +297,8 @@ const navigation = [
   // { name: "Home", href: "", icon: HomeIcon, current: false },
   { name: "Albums", href: "albums", icon: CollectionIcon, current: true },
   { name: "Photos", href: "photos", icon: PhotographIcon, current: false },
-  { name: "Profile", href: "login", icon: PhotographIcon, current: false }, // TODO:
-  { name: "Logout", href: "login", icon: LogoutIcon, current: false },
+  { name: "Profile", href: "profile", icon: UserIcon, current: false }, // TODO:
+  // { name: "Logout", href: "", icon: LogoutIcon, current: false },
 ];
 
 function classNames(...classes) {
@@ -670,6 +671,10 @@ export default function AppPage({ children }) {
           <Route path={`${path}/upload/:album_name`}>
             <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
             <Upload />
+          </Route>
+          <Route path={`${path}/profile`}>
+            <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
+            <UpdateProfile />
           </Route>
           <Route path={`${path}/login`}>
             <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
