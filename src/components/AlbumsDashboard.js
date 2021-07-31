@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, Fragment } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import {
   FetchStatus,
@@ -13,7 +13,6 @@ import {
   useRouteMatch,
   Switch,
   Route,
-  useParams,
   useHistory,
 } from "react-router-dom";
 
@@ -25,18 +24,15 @@ import {
   ClockIcon,
 } from "@heroicons/react/outline";
 
-import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   LogoutIcon,
   CollectionIcon,
-  HomeIcon,
   MenuAlt2Icon,
   XIcon,
 } from "@heroicons/react/outline";
 
 import Pig from "pig-react";
-import imageData from "./imageData.json";
 
 import Upload from "./Upload";
 import _ from "lodash";
@@ -55,7 +51,12 @@ function CreateAlbumButton({ onClick }) {
   );
 }
 
-function AlbumNameGrid({ albums }) {
+function AlbumNameGrid({ albums, setSelectedAlbum }) {
+  const history = useHistory();
+  function handleAlbumView(albumName) {
+    setSelectedAlbum(albumName);
+    history.push("/app/photos");
+  }
   return (
     <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {albums.map((album) => (
@@ -81,8 +82,8 @@ function AlbumNameGrid({ albums }) {
           <div>
             <div className="-mt-px flex divide-x divide-gray-200">
               <div className="w-0 flex-1 flex">
-                <Link
-                  to={`/app/photos/${album}`}
+                <button
+                  onClick={(_) => handleAlbumView(album)}
                   className="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500"
                 >
                   <PhotographIcon
@@ -90,7 +91,7 @@ function AlbumNameGrid({ albums }) {
                     aria-hidden="true"
                   />
                   <span className="ml-3">View</span>
-                </Link>
+                </button>
               </div>
               <div className="-ml-px w-0 flex-1 flex">
                 <Link
@@ -112,10 +113,12 @@ function AlbumNameGrid({ albums }) {
   );
 }
 
-function TableComponent({ getAlbumsStatus, albums }) {
+function TableComponent({ getAlbumsStatus, albums, setSelectedAlbum }) {
   switch (getAlbumsStatus) {
     case FetchStatus.FetchSuccess:
-      return <AlbumNameGrid albums={albums} />;
+      return (
+        <AlbumNameGrid albums={albums} setSelectedAlbum={setSelectedAlbum} />
+      );
     default:
       return (
         <>
@@ -140,8 +143,8 @@ function LoginSection() {
     try {
       setError("");
       setLoading(true);
-      // await login(emailRef.current.value, passwordRef.current.value);
-      await login("cd@e.com", "ffffff"); // TODO
+      await login(emailRef.current.value, passwordRef.current.value);
+      // await login("cd@e.com", "ffffff"); // TODO
       history.push("/app");
     } catch {
       setError("Failed to log in");
@@ -366,7 +369,7 @@ function MainContentHeader({ setMobileMenuOpen, children }) {
   );
 }
 
-function MainContentBody({ getAlbumsStatus, albums }) {
+function MainContentBody({ getAlbumsStatus, albums, setSelectedAlbum }) {
   return (
     <div className="flex-1 flex items-stretch overflow-hidden">
       <main className="flex-1 overflow-y-auto">
@@ -376,7 +379,11 @@ function MainContentBody({ getAlbumsStatus, albums }) {
           </div>
 
           <section className="mt-8 pb-16" aria-labelledby="gallery-heading">
-            <TableComponent getAlbumsStatus={getAlbumsStatus} albums={albums} />
+            <TableComponent
+              getAlbumsStatus={getAlbumsStatus}
+              albums={albums}
+              setSelectedAlbum={setSelectedAlbum}
+            />
           </section>
         </div>
       </main>
@@ -384,7 +391,7 @@ function MainContentBody({ getAlbumsStatus, albums }) {
   );
 }
 
-function MainContentSection({ setMobileMenuOpen }) {
+function MainContentSection({ setMobileMenuOpen, setSelectedAlbum }) {
   const { currentUser } = useAuth();
   const [getAlbums, getAlbumsStatus, albums] = useGetAlbums(currentUser);
   const [createAlbum, _createAlbumStatus] = useCreateAlbum(currentUser);
@@ -402,22 +409,37 @@ function MainContentSection({ setMobileMenuOpen }) {
       <MainContentHeader setMobileMenuOpen={setMobileMenuOpen}>
         <SearchBar handleCreateAlbum={handleCreateAlbum} />
       </MainContentHeader>
-      <MainContentBody getAlbumsStatus={getAlbumsStatus} albums={albums} />
+      <MainContentBody
+        getAlbumsStatus={getAlbumsStatus}
+        albums={albums}
+        setSelectedAlbum={setSelectedAlbum}
+      />
     </>
   );
 }
 
-function PigSection({ setMobileMenuOpen }) {
+function EmptyPhotosCard() {
+  return (
+    <Link
+      to="/app/albums"
+      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      Choose Album
+    </Link>
+  );
+}
+
+function PigSection({ setMobileMenuOpen, selectedAlbum }) {
   const { currentUser } = useAuth();
   const [getAlbumJson, getAlbumJsonStatus, albumJson] =
     useGetAlbumJson(currentUser);
-  const [selectedUserId, setSelectedUserId] = useState(0);
+  const [selectedUserId, _setSelectedUserId] = useState(0);
 
-  const { album_name } = useParams();
+  // const { album_name } = useParams();
 
   useEffect(() => {
     if (getAlbumJsonStatus == FetchStatus.FetchNotCalled) {
-      getAlbumJson(album_name);
+      getAlbumJson(selectedAlbum);
     }
   }, []);
 
@@ -429,7 +451,7 @@ function PigSection({ setMobileMenuOpen }) {
     const imageData = photos.map((photo) => {
       return {
         dominantColor: "#0C0E14",
-        url: `http://192.168.1.13:8081/static_sm/${album_name}/${photo}`,
+        url: `http://192.168.1.13:8081/static_sm/${selectedAlbum}/${photo}`,
         date: "22 October 2017",
         aspectRatio: 1.5,
       };
@@ -465,7 +487,7 @@ function PigSection({ setMobileMenuOpen }) {
   return (
     <>
       <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
-      {rederPig(getAlbumJsonStatus)}
+      {selectedAlbum ? rederPig(getAlbumJsonStatus) : <EmptyPhotosCard />}
     </>
   );
 }
@@ -614,6 +636,7 @@ function MobileMenu({ url, mobileMenuOpen, setMobileMenuOpen }) {
 
 export default function AppPage({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedAlbum, setSelectedAlbum] = useState("");
   let { path, url } = useRouteMatch();
 
   return (
@@ -632,11 +655,17 @@ export default function AppPage({ children }) {
           <Route exact path={path}>
             <MainContentSection setMobileMenuOpen={setMobileMenuOpen} />
           </Route>
-          <Route path={`${path}/photos/:album_name`}>
-            <PigSection setMobileMenuOpen={setMobileMenuOpen} />
+          <Route exact path={`${path}/photos`}>
+            <PigSection
+              setMobileMenuOpen={setMobileMenuOpen}
+              selectedAlbum={selectedAlbum}
+            />
           </Route>
           <Route path={`${path}/albums`}>
-            <MainContentSection setMobileMenuOpen={setMobileMenuOpen} />
+            <MainContentSection
+              setMobileMenuOpen={setMobileMenuOpen}
+              setSelectedAlbum={setSelectedAlbum}
+            />
           </Route>
           <Route path={`${path}/upload/:album_name`}>
             <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
