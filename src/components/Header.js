@@ -48,13 +48,13 @@ export function Header() {
               </div>
               <div className="hidden md:flex md:items-center md:space-x-6">
                 <Link
-                  to="/app/login"
+                  to="/login"
                   className="text-base font-medium text-white hover:text-gray-300"
                 >
                   Log in
                 </Link>
                 <Link
-                  to="/app/login"
+                  to="/login"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700"
                 >
                   Start free trial
