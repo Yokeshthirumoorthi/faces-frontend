@@ -6,6 +6,7 @@ import AppPageRouter from "./AlbumsDashboard";
 import Home from "./Home";
 import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
+import PageNotFound from "./404page";
 import ForgotPassword from "./ForgotPassword";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/signup" component={Signup} />
           <Route path="/login" component={Login} />
           <Route path="/forgot-password" component={ForgotPassword} />
+          <Route component={PageNotFound} />
         </Switch>
       </AuthProvider>
     </Router>
