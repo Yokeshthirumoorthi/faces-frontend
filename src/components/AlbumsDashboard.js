@@ -14,6 +14,7 @@ import {
   Switch,
   Route,
   useHistory,
+  useLocation,
 } from "react-router-dom";
 
 /* This example requires Tailwind CSS v2.0+ */
@@ -293,14 +294,6 @@ function LoginSection() {
   );
 }
 
-const navigation = [
-  // { name: "Home", href: "", icon: HomeIcon, current: false },
-  { name: "Albums", href: "albums", icon: CollectionIcon, current: true },
-  { name: "Photos", href: "photos", icon: PhotographIcon, current: false },
-  { name: "Profile", href: "profile", icon: UserIcon, current: false }, // TODO:
-  // { name: "Logout", href: "", icon: LogoutIcon, current: false },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -421,12 +414,23 @@ function MainContentSection({ setMobileMenuOpen, setSelectedAlbum }) {
 
 function EmptyPhotosCard() {
   return (
-    <Link
-      to="/app/albums"
-      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-    >
-      Choose Album
-    </Link>
+    <section className="text-gray-600 body-font">
+      <div className="container mx-auto flex px-5 py-24 items-center justify-center flex-col">
+        <div className="text-center lg:w-2/3 w-full">
+          <p className="mb-8 leading-relaxed">
+            You may need to select an album to view photos
+          </p>
+          <div className="flex justify-center">
+            <Link
+              to="/app/albums"
+              className="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+            >
+              Choose Album
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -493,7 +497,7 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
   );
 }
 
-function Sidebar({ url }) {
+function Sidebar({ url, navigation }) {
   return (
     <div className="hidden w-28 bg-indigo-700 overflow-y-auto md:block">
       <div className="w-full py-6 flex flex-col items-center">
@@ -537,7 +541,7 @@ function Sidebar({ url }) {
   );
 }
 
-function MobileMenu({ url, mobileMenuOpen, setMobileMenuOpen }) {
+function MobileMenu({ url, navigation, mobileMenuOpen, setMobileMenuOpen }) {
   return (
     <Transition.Root show={mobileMenuOpen} as={Fragment}>
       <Dialog
@@ -639,13 +643,37 @@ export default function AppPage({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedAlbum, setSelectedAlbum] = useState("");
   let { path, url } = useRouteMatch();
+  let location = useLocation();
 
+  const navigation = [
+    // { name: "Home", href: "", icon: HomeIcon, current: false },
+    {
+      name: "Albums",
+      href: "albums",
+      icon: CollectionIcon,
+      current: location.pathname === "/app/albums",
+    },
+    {
+      name: "Photos",
+      href: "photos",
+      icon: PhotographIcon,
+      current: location.pathname === "/app/photos",
+    },
+    {
+      name: "Profile",
+      href: "profile",
+      icon: UserIcon,
+      current: location.pathname === "/app/prifile",
+    }, // TODO:
+    // { name: "Logout", href: "", icon: LogoutIcon, current: false },
+  ];
   return (
     <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Narrow sidebar */}
-      <Sidebar url={url} />
+      <Sidebar url={url} navigation={navigation} />
       <MobileMenu
         url={url}
+        navigation={navigation}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />
