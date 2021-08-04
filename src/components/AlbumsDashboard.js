@@ -37,6 +37,7 @@ import Pig from "pig-react";
 import UpdateProfile from "./UpdateProfile";
 
 import Upload from "./Upload";
+import Profile from "./Profile";
 import _ from "lodash";
 
 import "./base.css";
@@ -714,7 +715,7 @@ export default function AppPage({ children }) {
           </Route>
           <Route path={`${path}/profile`}>
             <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
-            <UpdateProfile />
+            <Profile />
           </Route>
           <Route path={`${path}/login`}>
             <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
