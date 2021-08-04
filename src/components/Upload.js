@@ -2,7 +2,11 @@ import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "react-bootstrap";
-import { useProcessAlbum, getAlbumUploadStatus } from "../hooks/server";
+import {
+  FetchStatus,
+  useProcessAlbum,
+  getAlbumUploadStatus,
+} from "../hooks/server";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -14,21 +18,21 @@ import "./filepond.css";
 // Register the plugins
 registerPlugin(FilePondPluginImagePreview);
 
-function ProcessAlbumButton({ albumName }) {
-  const { currentUser } = useAuth();
-  const [processAlbum, _processAlbumStatus] = useProcessAlbum(currentUser);
+// function ProcessAlbumButton({ albumName }) {
+//   const { currentUser } = useAuth();
+//   const [processAlbum, _processAlbumStatus] = useProcessAlbum(currentUser);
 
-  function handleProcessAlbum() {
-    console.log("Processing Album");
-    processAlbum(albumName);
-  }
+//   function handleProcessAlbum() {
+//     console.log("Processing Album");
+//     processAlbum(albumName);
+//   }
 
-  return (
-    <Button variant="link" onClick={handleProcessAlbum}>
-      Process Album
-    </Button>
-  );
-}
+//   return (
+//     <Button variant="link" onClick={handleProcessAlbum}>
+//       Process Album
+//     </Button>
+//   );
+// }
 
 function UploadStat({ uploadStat }) {
   return (
@@ -92,6 +96,8 @@ export default function Filepond() {
   const { currentUser } = useAuth();
   const [files, setFiles] = useState([]);
   const [showProgressBar, setShowProgressBar] = useState(false);
+  const [processAlbum, processAlbumStatus] = useProcessAlbum(currentUser);
+
   const initalState = {
     uploaded: 0,
     pending: 0,
@@ -110,6 +116,7 @@ export default function Filepond() {
       statRef.current.success + statRef.current.failure
     ) {
       setShowProgressBar(false);
+      processAlbum(album_name);
       return;
     }
     if (taskStatus === "SUCCESS") {
@@ -155,11 +162,46 @@ export default function Filepond() {
     ];
   }
 
+  function renderProcessAlbumSpinner(processAlbumStatus) {
+    console.log(processAlbumStatus);
+    switch (processAlbumStatus) {
+      case FetchStatus.Fetching:
+        return (
+          <div className="text-center">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                vectorEffect="non-scaling-stroke"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+              />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              Processing Your Album
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Please Wait and donot close this page
+            </p>
+          </div>
+        );
+      default:
+        return React.null;
+    }
+  }
+
   return (
     <div className="App">
       {/* <ProcessAlbumButton albumName={album_name} /> */}
       <UploadStat uploadStat={formatUploadStat(stat)} />
       {showProgressBar && <ProgressBar stat={stat} />}
+      {renderProcessAlbumSpinner(processAlbumStatus)}
       <FilePond
         files={files}
         onupdatefiles={uploadAndTrackStatus}
