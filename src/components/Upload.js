@@ -52,9 +52,46 @@ function UploadStat({ uploadStat }) {
   );
 }
 
+function ProgressBar({ stat }) {
+  const imageProcessingPercentComplete = Math.round(
+    ((stat.success + stat.failure) * 100) / stat.uploaded
+  );
+  const imageUploadPercentComplete = Math.round(
+    (stat.pending * 100) / stat.uploaded
+  );
+  return (
+    <div className="relative pl-5 pr-5">
+      <div className="flex mb-2 items-center justify-between">
+        <div>
+          <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+            Task in progress
+          </span>
+        </div>
+        <div className="text-right">
+          <span className="text-xs font-semibold inline-block text-green-600">
+            {`${imageProcessingPercentComplete}%`}
+          </span>
+        </div>
+      </div>
+
+      <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+        <div
+          style={{ width: `${imageProcessingPercentComplete}%` }}
+          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500"
+        ></div>
+        <div
+          style={{ width: `${imageUploadPercentComplete}%` }}
+          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
+        ></div>
+      </div>
+    </div>
+  );
+}
+
 export default function Filepond() {
   const { currentUser } = useAuth();
   const [files, setFiles] = useState([]);
+  const [showProgressBar, setShowProgressBar] = useState(false);
   const initalState = {
     uploaded: 0,
     pending: 0,
@@ -71,8 +108,10 @@ export default function Filepond() {
     if (
       statRef.current.uploaded ===
       statRef.current.success + statRef.current.failure
-    )
+    ) {
+      setShowProgressBar(false);
       return;
+    }
     if (taskStatus === "SUCCESS") {
       statRef.current = {
         ...statRef.current,
@@ -99,11 +138,12 @@ export default function Filepond() {
     setFiles(files);
     statRef.current = {
       uploaded: files.length,
-      pending: files.length,
+      pending: 0,
       success: 0,
       failure: 0,
     };
     setStat(statRef.current);
+    setShowProgressBar(true);
   }
 
   function formatUploadStat(stats) {
@@ -119,6 +159,7 @@ export default function Filepond() {
     <div className="App">
       {/* <ProcessAlbumButton albumName={album_name} /> */}
       <UploadStat uploadStat={formatUploadStat(stat)} />
+      {showProgressBar && <ProgressBar stat={stat} />}
       <FilePond
         files={files}
         onupdatefiles={uploadAndTrackStatus}
@@ -171,6 +212,10 @@ export default function Filepond() {
               if (request.status >= 200 && request.status < 300) {
                 // the load method accepts either a string (id) or an object
                 load(request.responseText);
+                statRef.current = {
+                  ...statRef.current,
+                  pending: statRef.current.pending + 1,
+                };
                 const taskID = JSON.parse(request.responseText)["task_id"];
                 getStatus(taskID);
               } else {
