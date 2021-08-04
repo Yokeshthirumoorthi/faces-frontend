@@ -358,6 +358,25 @@ function SearchBar({ handleCreateAlbum }) {
   );
 }
 
+function FaceGrid({ album, faces, setSelectedUserId }) {
+  return (
+    <section>
+      <div className="mx-auto flex items-center flex-wrap pt-2 pb-2">
+        <div className="w-full md:w-1/6 xl:w-1/9 p-6 flex flex-row hover:grow">
+          {faces.map((faceId) => (
+            <img
+              key={faceId}
+              className="w-3/4 h-3/4  rounded-full p-1 hover:shadow-2xl hover:bg-red-200"
+              src={`http://192.168.1.13:8081/static_faces/${album}/face_${faceId}.jpg`}
+              onClick={(_) => setSelectedUserId(faceId)}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function MainContentHeader({ setMobileMenuOpen, children }) {
   return (
     <header className="w-full">
@@ -451,7 +470,7 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
   const { currentUser } = useAuth();
   const [getAlbumJson, getAlbumJsonStatus, albumJson] =
     useGetAlbumJson(currentUser);
-  const [selectedUserId, _setSelectedUserId] = useState(0);
+  const [selectedUserId, setSelectedUserId] = useState(0);
 
   // const { album_name } = useParams();
 
@@ -477,20 +496,35 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
     return imageData;
   };
 
+  const recommendedFaces = (selectedUserId) => {
+    const recommendations = albumJson.recommendations;
+    const faces = _.find(recommendations, function (o) {
+      return o.label == selectedUserId;
+    }).users;
+    return faces;
+  };
+
   const rederPig = (getAlbumJsonStatus) => {
     switch (getAlbumJsonStatus) {
       case FetchStatus.FetchSuccess:
         return (
-          <Pig
-            imageData={recommendedPhotos(selectedUserId)}
-            gridGap={2}
-            bgColor="hsla(211, 50%, 98%)"
-            groupGapLg={50}
-            groupGapSm={20}
-            breakpoint={800}
-            // sortByDate
-            // groupByDate
-          />
+          <>
+            <FaceGrid
+              album={selectedAlbum}
+              faces={recommendedFaces(selectedUserId)}
+              setSelectedUserId={setSelectedUserId}
+            />
+            <Pig
+              imageData={recommendedPhotos(selectedUserId)}
+              gridGap={2}
+              bgColor="hsla(211, 50%, 98%)"
+              groupGapLg={50}
+              groupGapSm={20}
+              breakpoint={800}
+              // sortByDate
+              // groupByDate
+            />
+          </>
         );
       default:
         return (
@@ -502,6 +536,7 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
     }
   };
 
+  console.log(selectedUserId);
   return (
     <>
       <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
