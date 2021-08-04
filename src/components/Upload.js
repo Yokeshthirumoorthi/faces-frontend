@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "react-bootstrap";
-import { useProcessAlbum } from "../hooks/server";
+import { useProcessAlbum, getAlbumUploadStatus } from "../hooks/server";
 
-import { FilePond, File, registerPlugin } from "react-filepond";
+import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
@@ -30,17 +30,98 @@ function ProcessAlbumButton({ albumName }) {
   );
 }
 
+function UploadStat({ uploadStat }) {
+  return (
+    <div>
+      <dl className="m-5 grid grid-cols-2 gap-5 sm:grid-cols-4">
+        {uploadStat.map((item) => (
+          <div
+            key={item.name}
+            className="px-4 py-1 bg-white shadow rounded-lg overflow-hidden sm:p-6"
+          >
+            <dt className="text-sm font-medium text-gray-500 truncate">
+              {item.name}
+            </dt>
+            <dd className="mt-1 text-3xl font-semibold text-gray-900">
+              {item.stat}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 export default function Filepond() {
   const { currentUser } = useAuth();
   const [files, setFiles] = useState([]);
+  const initalState = {
+    uploaded: 0,
+    pending: 0,
+    success: 0,
+    failure: 0,
+  };
+  const [stat, setStat] = useState(initalState);
+  const statRef = useRef(initalState);
+
   const { album_name } = useParams();
+
+  async function getStatus(taskId) {
+    const taskStatus = await getAlbumUploadStatus(currentUser, taskId);
+    if (
+      statRef.current.uploaded ===
+      statRef.current.success + statRef.current.failure
+    )
+      return;
+    if (taskStatus === "SUCCESS") {
+      statRef.current = {
+        ...statRef.current,
+        pending: statRef.current.pending - 1,
+        success: statRef.current.success + 1,
+      };
+    }
+    if (taskStatus === "FAILURE") {
+      statRef.current = {
+        ...statRef.current,
+        pending: statRef.current.pending - 1,
+        failure: statRef.current.failure + 1,
+      };
+    }
+
+    setStat(statRef.current);
+
+    setTimeout(function () {
+      getStatus(taskId);
+    }, 2000);
+  }
+
+  function uploadAndTrackStatus(files) {
+    setFiles(files);
+    statRef.current = {
+      uploaded: files.length,
+      pending: files.length,
+      success: 0,
+      failure: 0,
+    };
+    setStat(statRef.current);
+  }
+
+  function formatUploadStat(stats) {
+    return [
+      { name: "Files Uploaded", stat: stats.uploaded },
+      { name: "Total Pending", stat: stats.pending },
+      { name: "Total Success", stat: stats.success },
+      { name: "Total Failure", stat: stats.failure },
+    ];
+  }
 
   return (
     <div className="App">
-      <ProcessAlbumButton albumName={album_name} />
+      {/* <ProcessAlbumButton albumName={album_name} /> */}
+      <UploadStat uploadStat={formatUploadStat(stat)} />
       <FilePond
         files={files}
-        onupdatefiles={setFiles}
+        onupdatefiles={uploadAndTrackStatus}
         allowMultiple={true}
         maxParallelUploads={25}
         name="file"
@@ -90,6 +171,8 @@ export default function Filepond() {
               if (request.status >= 200 && request.status < 300) {
                 // the load method accepts either a string (id) or an object
                 load(request.responseText);
+                const taskID = JSON.parse(request.responseText)["task_id"];
+                getStatus(taskID);
               } else {
                 // Can call the error method if something is wrong, should exit after
                 error("oh no");

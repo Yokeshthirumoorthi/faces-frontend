@@ -108,6 +108,18 @@ let useProcessAlbum = (currentUser) => {
 
   return [processAlbum, processAlbumStatus];
 };
+
+let getAlbumUploadStatus = async (currentUser, albumName) => {
+  // albumName = "testalbum"; // TODO: delete this line
+  const idToken = await currentUser.getIdToken(/* forceRefresh */ true);
+  const headers = {
+    Authorization: `Bearer ${idToken}`,
+  };
+  const url = `http://192.168.1.13:8081/api/v1/upload/tasks/${albumName}`;
+  const resp = await axios.get(url, { headers });
+  return resp.data.task_status;
+};
+
 export {
   FetchStatus,
   useGetAlbums,
@@ -115,4 +127,5 @@ export {
   useCreateAlbum,
   useGetAlbumJson,
   useProcessAlbum,
+  getAlbumUploadStatus,
 };
