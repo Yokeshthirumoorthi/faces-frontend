@@ -179,6 +179,14 @@ export default class Pig extends Component {
     window.removeEventListener("resize", this.debouncedResize);
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.imageData !== prevProps.imageData) {
+      this.imageData = this.props.imageData;
+      this.imageData = this.getUpdatedImageLayout();
+      this.setRenderedItems(this.imageData);
+    }
+  }
+
   renderTile = item => (
     <Tile
       key={item.url}

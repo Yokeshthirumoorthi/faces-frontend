@@ -360,20 +360,23 @@ function SearchBar({ handleCreateAlbum }) {
 
 function FaceGrid({ album, faces, setSelectedUserId }) {
   return (
-    <section>
-      <div className="mx-auto flex items-center flex-wrap pt-2 pb-2">
-        <div className="w-full md:w-1/6 xl:w-1/9 p-6 flex flex-row hover:grow">
-          {faces.map((faceId) => (
+    <ul
+      role="list"
+      className="grid grid-cols-4 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-8 xl:gap-x-12"
+    >
+      {faces.map((faceId) => (
+        <li key={faceId} className="relative">
+          <div className="group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden">
             <img
-              key={faceId}
-              className="w-3/4 h-3/4  rounded-full p-1 hover:shadow-2xl hover:bg-red-200"
               src={`http://192.168.1.13:8081/static_faces/${album}/face_${faceId}.jpg`}
+              alt=""
               onClick={(_) => setSelectedUserId(faceId)}
+              className="inline-block h-3/4 w-3/4 rounded-full"
             />
-          ))}
-        </div>
-      </div>
-    </section>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
