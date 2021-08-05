@@ -1,5 +1,4 @@
 import React from "react";
-
 import { footerNavigation } from "./homeData";
 
 export function Footer() {
@@ -17,8 +16,8 @@ export function Footer() {
               alt="Company name"
             />
             <p className="text-gray-500 text-base">
-              Making the world a better place through constructing elegant
-              hierarchies.
+              Making the world a happy place through constructing personalized
+              albums.
             </p>
             {/* <div className="flex space-x-6">
                             {footerNavigation.social.map((item) => (
@@ -31,23 +30,18 @@ export function Footer() {
           </div>
           <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
             <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-                  Solutions
-                </h3>
-                <ul className="mt-4 space-y-4">
-                  {footerNavigation.solutions.map((item) => (
-                    <li key={item.name}>
-                      <a
-                        href={item.href}
-                        className="text-base text-gray-500 hover:text-gray-900"
-                      >
-                        {item.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {/* <div>
+                                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Solutions</h3>
+                                <ul className="mt-4 space-y-4">
+                                    {footerNavigation.solutions.map((item) => (
+                                        <li key={item.name}>
+                                            <a href={item.href} className="text-base text-gray-500 hover:text-gray-900">
+                                                {item.name}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div> */}
               <div className="mt-12 md:mt-0">
                 <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
                   Support
@@ -67,23 +61,18 @@ export function Footer() {
               </div>
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-                  Company
-                </h3>
-                <ul className="mt-4 space-y-4">
-                  {footerNavigation.company.map((item) => (
-                    <li key={item.name}>
-                      <a
-                        href={item.href}
-                        className="text-base text-gray-500 hover:text-gray-900"
-                      >
-                        {item.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {/* <div>
+                                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+                                <ul className="mt-4 space-y-4">
+                                    {footerNavigation.company.map((item) => (
+                                        <li key={item.name}>
+                                            <a href={item.href} className="text-base text-gray-500 hover:text-gray-900">
+                                                {item.name}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div> */}
               <div className="mt-12 md:mt-0">
                 <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
                   Legal
@@ -106,7 +95,7 @@ export function Footer() {
         </div>
         <div className="mt-12 border-t border-gray-200 py-8">
           <p className="text-base text-gray-400 xl:text-center">
-            &copy; 2020 Workflow, Inc. All rights reserved.
+            &copy; 2021 SmartPic, Inc. All rights reserved.
           </p>
         </div>
       </div>
