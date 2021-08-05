@@ -488,14 +488,23 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
 
   const recommendedPhotos = (selectedUserId) => {
     const recommendations = albumJson.recommendations;
+    const photo_faces = albumJson.photo_faces;
     const photos = _.find(recommendations, function (o) {
       return o.label == selectedUserId;
     }).photos;
-    const imageData = photos.map((photo) => {
+
+    const photoFaces = (photoName) =>
+      _.find(photo_faces, function (o) {
+        return o.photo == photoName;
+      }).labels;
+
+    const imageData = photos.map((photoName) => {
       return {
         dominantColor: "#0C0E14",
-        url: `http://192.168.1.13:8081/static_sm/${selectedAlbum}/${photo}`,
-        name: photo,
+        url: `http://192.168.1.13:8081/static_sm/${selectedAlbum}/${photoName}`,
+        imageName: photoName,
+        albumName: selectedAlbum,
+        faces: photoFaces(photoName),
         date: "22 October 2017",
         aspectRatio: 1.5,
       };

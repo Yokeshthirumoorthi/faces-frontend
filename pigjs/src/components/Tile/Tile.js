@@ -46,15 +46,26 @@ const Tile = React.memo(function Tile({
     config: { mass: 1.5, tension: 400, friction: 40 }
   });
 
+  function FigCaptionAvatars({ albumName, imageName, faces }) {
+    return faces.map((faceId, idx) => (
+      <a key={idx} href={`/album/${albumName}/${faceId}`}>
+        <img
+          className="inline-block h-12 w-12 rounded-full ring-2 ring-white"
+          src={`http://192.168.1.13:8081/static_faces/${albumName}/${imageName}_${idx}.jpg`}
+        />
+      </a>
+    ));
+  }
+
   return (
     <animated.figure
       className={`${styles.pigBtn}${
         isExpanded ? ` ${styles.pigBtnActive}` : ""
       } pig-btn`}
       // onClick={() => handleClick(item)}
-      itemprop="associatedMedia"
-      itemscope
-      itemtype="http://schema.org/ImageObject"
+      itemProp="associatedMedia"
+      itemScope={true}
+      itemType="http://schema.org/ImageObject"
       style={{
         outline: isExpanded
           ? `${settings.gridGap}px solid ${settings.bgColor}`
@@ -69,7 +80,7 @@ const Tile = React.memo(function Tile({
       <a
         href={getUrl(item.url, getImageHeight(containerWidth))}
         data-size={`${Math.ceil(calcWidth)}x${Math.ceil(calcHeight)}`}
-        itemprop="contentUrl"
+        itemProp="contentUrl"
       >
         {useLqip && (
           // LQIP
@@ -81,7 +92,7 @@ const Tile = React.memo(function Tile({
             loading="lazy"
             width={item.style.width}
             height={item.style.height}
-            itemprop="thumbnail"
+            itemProp="thumbnail"
             alt=""
           />
         )}
@@ -94,12 +105,21 @@ const Tile = React.memo(function Tile({
             }`}
             src={getUrl(item.url, getImageHeight(containerWidth))}
             alt=""
-            itemprop="thumbnail"
+            itemProp="thumbnail"
             onLoad={() => setFullSizeLoaded(true)}
           />
         )}
       </a>
-      <figcaption itemprop="caption description">{`Date: ${item.name}`}</figcaption>
+      <figcaption
+        itemProp="caption description"
+        className="flex -space-x-1 overflow-hidden"
+      >
+        <FigCaptionAvatars
+          albumName={item.albumName}
+          imageName={item.imageName}
+          faces={item.faces}
+        />
+      </figcaption>
 
       {scrollSpeed === "slow" && isVideo && (
         <video
