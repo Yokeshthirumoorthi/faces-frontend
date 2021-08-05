@@ -99,59 +99,50 @@ export default function Filepond() {
   const [files, setFiles] = useState([]);
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [processAlbum, processAlbumStatus] = useProcessAlbum(currentUser);
-
-  const initalState = {
+  const initialStat = {
     uploaded: 0,
     pending: 0,
     success: 0,
     failure: 0,
   };
-  const [stat, setStat] = useState(initalState);
-  const statRef = useRef(initalState);
+  const [stat, setStat] = useState(initialStat);
+  const taskIdsRef = useRef([]);
 
   const { album_name } = useParams();
 
-  async function getStatus(taskId) {
-    const taskStatus = await getAlbumUploadStatus(currentUser, taskId);
-    if (
-      statRef.current.uploaded ===
-      statRef.current.success + statRef.current.failure
-    ) {
+  async function trackUploadStatus(stat, taskIds) {
+    const uploadStatus = await getAlbumUploadStatus(currentUser, taskIds);
+    if (uploadStatus.is_all_tasks_done) {
       setShowProgressBar(false);
+      setStat({
+        ...stat,
+        pending: taskIdsRef.current.length,
+        success: uploadStatus.success,
+        failure: uploadStatus.failure,
+      });
       processAlbum(album_name);
-      return;
+      return false;
     }
-    if (taskStatus === "SUCCESS") {
-      statRef.current = {
-        ...statRef.current,
-        pending: statRef.current.pending - 1,
-        success: statRef.current.success + 1,
-      };
-    }
-    if (taskStatus === "FAILURE") {
-      statRef.current = {
-        ...statRef.current,
-        pending: statRef.current.pending - 1,
-        failure: statRef.current.failure + 1,
-      };
-    }
-
-    setStat(statRef.current);
+    setStat({
+      ...stat,
+      pending: taskIdsRef.current.length,
+      success: uploadStatus.success,
+      failure: uploadStatus.failure,
+    });
     setTimeout(function () {
-      getStatus(taskId);
+      trackUploadStatus(stat, taskIdsRef.current);
     }, 2000);
   }
 
   function uploadAndTrackStatus(files) {
     setFiles(files);
-    statRef.current = {
+    const newStat = {
+      ...stat,
       uploaded: files.length,
-      pending: 0,
-      success: 0,
-      failure: 0,
     };
-    setStat(statRef.current);
+    setStat(newStat);
     setShowProgressBar(true);
+    trackUploadStatus(newStat, taskIdsRef.current);
   }
 
   function formatUploadStat(stats) {
@@ -257,12 +248,14 @@ export default function Filepond() {
               if (request.status >= 200 && request.status < 300) {
                 // the load method accepts either a string (id) or an object
                 load(request.responseText);
-                statRef.current = {
-                  ...statRef.current,
-                  pending: statRef.current.pending + 1,
-                };
+
                 const taskID = JSON.parse(request.responseText)["task_id"];
-                getStatus(taskID);
+
+                taskIdsRef.current = [...taskIdsRef.current, taskID];
+                // setStat({
+                //   ...stat,
+                //   pending: taskIdsRef.current.length,
+                // });
               } else {
                 // Can call the error method if something is wrong, should exit after
                 error("oh no");
