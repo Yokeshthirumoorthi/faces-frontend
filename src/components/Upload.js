@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { Button } from "react-bootstrap";
 import {
   FetchStatus,
   useProcessAlbum,
@@ -13,10 +12,13 @@ import "filepond/dist/filepond.min.css";
 
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import FilePondPluginFileSizeValidation from "filepond-plugin-file-validate-size";
+// import "filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.css";
 import "./filepond.css";
 
 // Register the plugins
 registerPlugin(FilePondPluginImagePreview);
+registerPlugin(FilePondPluginFileSizeValidation);
 
 // function ProcessAlbumButton({ albumName }) {
 //   const { currentUser } = useAuth();
@@ -135,7 +137,6 @@ export default function Filepond() {
     }
 
     setStat(statRef.current);
-
     setTimeout(function () {
       getStatus(taskId);
     }, 2000);
@@ -206,6 +207,8 @@ export default function Filepond() {
         files={files}
         onupdatefiles={uploadAndTrackStatus}
         allowMultiple={true}
+        allowFileSizeValidation={true}
+        maxFileSize={"5MB"}
         maxParallelUploads={25}
         name="file"
         instantUpload={true}
