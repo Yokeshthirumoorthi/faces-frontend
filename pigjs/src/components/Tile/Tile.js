@@ -47,13 +47,14 @@ const Tile = React.memo(function Tile({
   });
 
   return (
-    <animated.a
+    <animated.figure
       className={`${styles.pigBtn}${
         isExpanded ? ` ${styles.pigBtnActive}` : ""
       } pig-btn`}
       // onClick={() => handleClick(item)}
-      href={getUrl(item.url, getImageHeight(containerWidth))}
-      data-size={`${Math.ceil(calcWidth)}x${Math.ceil(calcHeight)}`}
+      itemprop="associatedMedia"
+      itemscope
+      itemtype="http://schema.org/ImageObject"
       style={{
         outline: isExpanded
           ? `${settings.gridGap}px solid ${settings.bgColor}`
@@ -65,31 +66,40 @@ const Tile = React.memo(function Tile({
         transform: transform.interpolate(t => t)
       }}
     >
-      {useLqip && (
-        // LQIP
-        <img
-          className={`${styles.pigImg} ${styles.pigThumbnail}${
-            isFullSizeLoaded ? ` ${styles.pigThumbnailLoaded}` : ""
-          }`}
-          src={getUrl(item.url, settings.thumbnailSize)}
-          loading="lazy"
-          width={item.style.width}
-          height={item.style.height}
-          alt=""
-        />
-      )}
+      <a
+        href={getUrl(item.url, getImageHeight(containerWidth))}
+        data-size={`${Math.ceil(calcWidth)}x${Math.ceil(calcHeight)}`}
+        itemprop="contentUrl"
+      >
+        {useLqip && (
+          // LQIP
+          <img
+            className={`${styles.pigImg} ${styles.pigThumbnail}${
+              isFullSizeLoaded ? ` ${styles.pigThumbnailLoaded}` : ""
+            }`}
+            src={getUrl(item.url, settings.thumbnailSize)}
+            loading="lazy"
+            width={item.style.width}
+            height={item.style.height}
+            itemprop="thumbnail"
+            alt=""
+          />
+        )}
 
-      {scrollSpeed === "slow" && !isVideo && (
-        // grid image
-        <img
-          className={`${styles.pigImg} ${styles.pigFull}${
-            isFullSizeLoaded ? ` ${styles.pigFullLoaded}` : ""
-          }`}
-          src={getUrl(item.url, getImageHeight(containerWidth))}
-          alt=""
-          onLoad={() => setFullSizeLoaded(true)}
-        />
-      )}
+        {scrollSpeed === "slow" && !isVideo && (
+          // grid image
+          <img
+            className={`${styles.pigImg} ${styles.pigFull}${
+              isFullSizeLoaded ? ` ${styles.pigFullLoaded}` : ""
+            }`}
+            src={getUrl(item.url, getImageHeight(containerWidth))}
+            alt=""
+            itemprop="thumbnail"
+            onLoad={() => setFullSizeLoaded(true)}
+          />
+        )}
+      </a>
+      <figcaption itemprop="caption description">{`Date: ${item.name}`}</figcaption>
 
       {scrollSpeed === "slow" && isVideo && (
         <video
@@ -125,7 +135,7 @@ const Tile = React.memo(function Tile({
           playsInline
         />
       )}
-    </animated.a>
+    </animated.figure>
   );
 });
 

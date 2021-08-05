@@ -232,12 +232,7 @@ export default class Pig extends Component {
   render() {
     return (
       <div className={`my-gallery ${styles.output}`} ref={this.containerRef}>
-        {this.state.renderedItems.map((item, idx) => (
-          <figure key={idx}>
-            {this.renderFlat(item)}
-            <figcaption>{`Date: ${item.date}`}</figcaption>
-          </figure>
-        ))}
+        {this.state.renderedItems.map(item => this.renderFlat(item))}
       </div>
     );
   }

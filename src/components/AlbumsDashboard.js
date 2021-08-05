@@ -495,6 +495,7 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
       return {
         dominantColor: "#0C0E14",
         url: `http://192.168.1.13:8081/static_sm/${selectedAlbum}/${photo}`,
+        name: photo,
         date: "22 October 2017",
         aspectRatio: 1.5,
       };
@@ -542,7 +543,6 @@ function PigSection({ setMobileMenuOpen, selectedAlbum }) {
     }
   };
 
-  console.log(selectedUserId);
   return (
     <>
       <MainContentHeader setMobileMenuOpen={setMobileMenuOpen} />
