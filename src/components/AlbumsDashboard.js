@@ -745,7 +745,10 @@ export default function AppPage({ children }) {
       <div className="flex-1 flex flex-col overflow-auto">
         <Switch>
           <Route exact path={path}>
-            <MainContentSection setMobileMenuOpen={setMobileMenuOpen} />
+            <MainContentSection
+              setMobileMenuOpen={setMobileMenuOpen}
+              setSelectedAlbum={setSelectedAlbum}
+            />
           </Route>
           <Route exact path={`${path}/photos`}>
             <PigSection
