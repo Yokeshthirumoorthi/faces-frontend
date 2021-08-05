@@ -13,7 +13,7 @@ import {
 
 export const navigation = [
   // { name: 'Product', href: '#' },
-  { name: "Features", href: "#" },
+  { name: "Features", href: "/#features" },
   // { name: 'Become an Insider', href: '#' },
   // { name: 'Company', href: '#' },
 ];

@@ -387,7 +387,9 @@ export default function App() {
           {/* <FeatureSection /> */}
 
           {/* Feature section with grid */}
-          <FeatureGrid />
+          <div id={"features"}>
+            <FeatureGrid />
+          </div>
 
           {/* Testimonial section */}
           {/* <Testimonial /> */}
@@ -396,7 +398,9 @@ export default function App() {
           {/* <BlogSection /> */}
 
           {/* CTA Section */}
-          <CtaSection />
+          <div id={"cta"}>
+            <CtaSection />
+          </div>
         </main>
         <Footer />
       </div>
